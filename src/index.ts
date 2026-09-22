@@ -41,22 +41,24 @@ const WARN_RULES = new Set(['prefer-ephemeral-flag', 'prefer-v2-component']);
 const presetRules: NonNullable<TSESLint.FlatConfig.Config['rules']> = {};
 for (const name of Object.keys(rules)) {
     presetRules[`@vybe-bot/discord/${name}`] = WARN_RULES.has(name) ? 'warn' : 'error';
-    presetRules[`discord/${name}`] = WARN_RULES.has(name) ? 'warn' : 'error';
 }
 
-export const recommended: TSESLint.FlatConfig.Config = {
-    plugins: {
-        '@vybe-bot/discord': plugin,
-        discord: plugin
-    },
-    languageOptions: {
-        parser: tseslintParser,
-        parserOptions: {
-            projectService: true
-        }
-    },
-    rules: presetRules
-};
+export const recommended: TSESLint.FlatConfig.ConfigArray = [
+    {
+        files: ['**/*.ts', '**/*.mts', '**/*.cts', '**/*.tsx'],
+        plugins: {
+            '@vybe-bot/discord': plugin,
+            discord: plugin
+        },
+        languageOptions: {
+            parser: tseslintParser,
+            parserOptions: {
+                projectService: true
+            }
+        },
+        rules: presetRules
+    }
+];
 
 plugin.configs = { recommended };
 
