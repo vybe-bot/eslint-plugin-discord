@@ -1,0 +1,5 @@
+import { ESLintUtils } from '@typescript-eslint/utils';
+
+export const createRule = ESLintUtils.RuleCreator(
+    (name) => `https://github.com/vybe-bot/eslint-plugin-discord/blob/main/docs/rules/${name}.md`
+);
