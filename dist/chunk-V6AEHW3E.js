@@ -1,64 +1,26 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.ts
-var index_exports = {};
-__export(index_exports, {
-  createSharedProgramConfig: () => createSharedProgramConfig,
-  default: () => index_default,
-  recommended: () => recommended
-});
-module.exports = __toCommonJS(index_exports);
-
 // src/utils/componentsV2.ts
-var import_utils4 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES3 } from "@typescript-eslint/utils";
 
 // src/utils/typeUtils.ts
-var import_utils2 = require("@typescript-eslint/utils");
-var import_typescript = require("typescript");
+import { AST_NODE_TYPES as AST_NODE_TYPES2 } from "@typescript-eslint/utils";
+import { SymbolFlags, TypeFlags } from "typescript";
 
 // src/utils/utils.ts
-var import_utils = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES } from "@typescript-eslint/utils";
 function methodName(call) {
   const { callee } = call;
-  if (callee.type !== import_utils.AST_NODE_TYPES.MemberExpression || callee.computed) return void 0;
-  if (callee.property.type !== import_utils.AST_NODE_TYPES.Identifier) return void 0;
+  if (callee.type !== AST_NODE_TYPES.MemberExpression || callee.computed) return void 0;
+  if (callee.property.type !== AST_NODE_TYPES.Identifier) return void 0;
   return callee.property.name;
 }
 function isChainTop(node) {
   const { parent } = node;
-  return parent.type !== import_utils.AST_NODE_TYPES.MemberExpression || parent.object !== node;
+  return parent.type !== AST_NODE_TYPES.MemberExpression || parent.object !== node;
 }
 function collectChain(top) {
   const calls = [];
   let current = top;
-  while (current.type === import_utils.AST_NODE_TYPES.CallExpression && current.callee.type === import_utils.AST_NODE_TYPES.MemberExpression) {
+  while (current.type === AST_NODE_TYPES.CallExpression && current.callee.type === AST_NODE_TYPES.MemberExpression) {
     calls.push(current);
     current = current.callee.object;
   }
@@ -66,14 +28,14 @@ function collectChain(top) {
 }
 function chainRoot(top) {
   let current = top;
-  while (current.type === import_utils.AST_NODE_TYPES.CallExpression && current.callee.type === import_utils.AST_NODE_TYPES.MemberExpression) {
+  while (current.type === AST_NODE_TYPES.CallExpression && current.callee.type === AST_NODE_TYPES.MemberExpression) {
     current = current.callee.object;
   }
   return current;
 }
 function enclosingChainTop(node) {
   let current = node;
-  while (current.parent?.type === import_utils.AST_NODE_TYPES.MemberExpression && current.parent.object === current && current.parent.parent.type === import_utils.AST_NODE_TYPES.CallExpression && current.parent.parent.callee === current.parent) {
+  while (current.parent?.type === AST_NODE_TYPES.MemberExpression && current.parent.object === current && current.parent.parent.type === AST_NODE_TYPES.CallExpression && current.parent.parent.callee === current.parent) {
     current = current.parent.parent;
   }
   return current;
@@ -82,43 +44,43 @@ function lastCall(calls, name) {
   return calls.find((call) => methodName(call) === name);
 }
 function calleeProperty(call) {
-  return call.callee.type === import_utils.AST_NODE_TYPES.MemberExpression ? call.callee.property : call;
+  return call.callee.type === AST_NODE_TYPES.MemberExpression ? call.callee.property : call;
 }
 function resolveConstInit(sourceCode, identifier) {
   const variable = sourceCode.getScope(identifier).references.find((ref) => ref.identifier === identifier)?.resolved;
   const definition = variable?.defs[0];
-  if (definition?.node.type !== import_utils.AST_NODE_TYPES.VariableDeclarator) return void 0;
+  if (definition?.node.type !== AST_NODE_TYPES.VariableDeclarator) return void 0;
   if (variable?.references.some((ref) => ref.isWrite() && !ref.init)) return void 0;
   return definition.node.init ?? void 0;
 }
 function propertyKeyIs(prop, name) {
   if (prop.computed) return false;
   const { key } = prop;
-  if (key.type === import_utils.AST_NODE_TYPES.Identifier) return key.name === name;
+  if (key.type === AST_NODE_TYPES.Identifier) return key.name === name;
   return key.value === name;
 }
 function getProperty(node, name) {
   return node.properties.find(
-    (prop) => prop.type === import_utils.AST_NODE_TYPES.Property && propertyKeyIs(prop, name)
+    (prop) => prop.type === AST_NODE_TYPES.Property && propertyKeyIs(prop, name)
   );
 }
 function constructorData(root) {
-  if (root.type !== import_utils.AST_NODE_TYPES.NewExpression) return void 0;
+  if (root.type !== AST_NODE_TYPES.NewExpression) return void 0;
   const arg = root.arguments[0];
-  if (arg === void 0 || arg.type === import_utils.AST_NODE_TYPES.SpreadElement) return void 0;
+  if (arg === void 0 || arg.type === AST_NODE_TYPES.SpreadElement) return void 0;
   const value = unwrapAssertions(arg);
-  return value.type === import_utils.AST_NODE_TYPES.ObjectExpression ? value : void 0;
+  return value.type === AST_NODE_TYPES.ObjectExpression ? value : void 0;
 }
 function outermostAssertion(node) {
   let current = node;
-  while (current.parent.type === import_utils.AST_NODE_TYPES.TSAsExpression || current.parent.type === import_utils.AST_NODE_TYPES.TSTypeAssertion || current.parent.type === import_utils.AST_NODE_TYPES.TSSatisfiesExpression || current.parent.type === import_utils.AST_NODE_TYPES.TSNonNullExpression) {
+  while (current.parent.type === AST_NODE_TYPES.TSAsExpression || current.parent.type === AST_NODE_TYPES.TSTypeAssertion || current.parent.type === AST_NODE_TYPES.TSSatisfiesExpression || current.parent.type === AST_NODE_TYPES.TSNonNullExpression) {
     current = current.parent;
   }
   return current;
 }
 function unwrapAssertions(expr) {
   let current = expr;
-  while (current.type === import_utils.AST_NODE_TYPES.TSAsExpression || current.type === import_utils.AST_NODE_TYPES.TSTypeAssertion || current.type === import_utils.AST_NODE_TYPES.TSSatisfiesExpression) {
+  while (current.type === AST_NODE_TYPES.TSAsExpression || current.type === AST_NODE_TYPES.TSTypeAssertion || current.type === AST_NODE_TYPES.TSSatisfiesExpression) {
     current = current.expression;
   }
   return current;
@@ -162,16 +124,16 @@ function trustedConstructorData(root, rootType) {
   return data !== void 0 && isFromDiscordJs(rootType.getSymbol()) ? data : void 0;
 }
 function staticNumber(node, services) {
-  if (node === void 0 || node.type === import_utils2.AST_NODE_TYPES.SpreadElement || node.type === import_utils2.AST_NODE_TYPES.AssignmentPattern || node.type === import_utils2.AST_NODE_TYPES.TSEmptyBodyFunctionExpression) {
+  if (node === void 0 || node.type === AST_NODE_TYPES2.SpreadElement || node.type === AST_NODE_TYPES2.AssignmentPattern || node.type === AST_NODE_TYPES2.TSEmptyBodyFunctionExpression) {
     return void 0;
   }
   const target = unwrapAssertions(node);
-  if (target.type === import_utils2.AST_NODE_TYPES.Literal && typeof target.value === "number") return target.value;
+  if (target.type === AST_NODE_TYPES2.Literal && typeof target.value === "number") return target.value;
   const type = services.getTypeAtLocation(target);
   return type.isNumberLiteral() ? type.value : void 0;
 }
 function booleanLiteralValue(checker, type) {
-  if ((type.flags & import_typescript.TypeFlags.BooleanLiteral) === 0) return void 0;
+  if ((type.flags & TypeFlags.BooleanLiteral) === 0) return void 0;
   return checker.typeToString(type) === "true";
 }
 function extendsSeedcordType(checker, type, names) {
@@ -197,10 +159,10 @@ function arrayHoldsV2(type, checker) {
   return elementType !== void 0 && isV2Type(elementType, checker);
 }
 function componentsValueIsV2(value, services, checker) {
-  if (value.type === import_utils4.AST_NODE_TYPES.ArrayExpression) {
+  if (value.type === AST_NODE_TYPES3.ArrayExpression) {
     return value.elements.some((element) => {
       if (element === null) return false;
-      if (element.type === import_utils4.AST_NODE_TYPES.SpreadElement) {
+      if (element.type === AST_NODE_TYPES3.SpreadElement) {
         return arrayHoldsV2(services.getTypeAtLocation(element.argument), checker);
       }
       return isV2Type(services.getTypeAtLocation(element), checker);
@@ -211,9 +173,9 @@ function componentsValueIsV2(value, services, checker) {
 function hasV2Components(node, services, checker) {
   let holdsV2 = false;
   for (const prop of node.properties) {
-    if (prop.type === import_utils4.AST_NODE_TYPES.Property && propertyKeyIs(prop, "components")) {
+    if (prop.type === AST_NODE_TYPES3.Property && propertyKeyIs(prop, "components")) {
       holdsV2 = componentsValueIsV2(prop.value, services, checker);
-    } else if (prop.type === import_utils4.AST_NODE_TYPES.SpreadElement) {
+    } else if (prop.type === AST_NODE_TYPES3.SpreadElement) {
       const symbol = services.getTypeAtLocation(prop.argument).getProperty("components");
       if (symbol !== void 0) holdsV2 = arrayHoldsV2(checker.getTypeOfSymbol(symbol), checker);
     }
@@ -222,11 +184,11 @@ function hasV2Components(node, services, checker) {
 }
 
 // src/rules/no-choices-and-autocomplete.ts
-var import_utils8 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES4, ESLintUtils as ESLintUtils2 } from "@typescript-eslint/utils";
 
 // src/createRule.ts
-var import_utils6 = require("@typescript-eslint/utils");
-var createRule = import_utils6.ESLintUtils.RuleCreator(
+import { ESLintUtils } from "@typescript-eslint/utils";
+var createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/vybe-bot/eslint-plugin-discord/blob/main/docs/rules/${name}.md`
 );
 
@@ -236,7 +198,7 @@ function autocompleteOn(calls, services, checker) {
   const last = calls.find((call) => methodName(call) === "setAutocomplete");
   const arg = last?.arguments[0];
   if (arg === void 0) return false;
-  if (arg.type === import_utils8.AST_NODE_TYPES.Literal) return arg.value === true;
+  if (arg.type === AST_NODE_TYPES4.Literal) return arg.value === true;
   return booleanLiteralValue(checker, services.getTypeAtLocation(arg)) === true;
 }
 function declaresChoices(calls) {
@@ -244,12 +206,12 @@ function declaresChoices(calls) {
   for (const call of [...calls].reverse()) {
     const name = methodName(call);
     if (name === "addChoices") {
-      if (call.arguments.some((arg) => arg.type !== import_utils8.AST_NODE_TYPES.SpreadElement)) has = true;
+      if (call.arguments.some((arg) => arg.type !== AST_NODE_TYPES4.SpreadElement)) has = true;
     } else if (name === "setChoices") {
       has = call.arguments.some((arg) => {
-        if (arg.type === import_utils8.AST_NODE_TYPES.SpreadElement) return false;
-        if (arg.type === import_utils8.AST_NODE_TYPES.ArrayExpression) {
-          return arg.elements.some((el) => el !== null && el.type !== import_utils8.AST_NODE_TYPES.SpreadElement);
+        if (arg.type === AST_NODE_TYPES4.SpreadElement) return false;
+        if (arg.type === AST_NODE_TYPES4.ArrayExpression) {
+          return arg.elements.some((el) => el !== null && el.type !== AST_NODE_TYPES4.SpreadElement);
         }
         return true;
       });
@@ -271,7 +233,7 @@ var no_choices_and_autocomplete_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils8.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils2.getParserServices(context);
     const checker = services.program.getTypeChecker();
     return {
       CallExpression(node) {
@@ -287,7 +249,7 @@ var no_choices_and_autocomplete_default = createRule({
 });
 
 // src/rules/no-conflicting-button-props.ts
-var import_utils11 = require("@typescript-eslint/utils");
+import { ESLintUtils as ESLintUtils3 } from "@typescript-eslint/utils";
 
 // src/buttons.ts
 var STYLE_NAMES = {
@@ -342,7 +304,7 @@ var no_conflicting_button_props_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils11.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils3.getParserServices(context);
     const checker = services.program.getTypeChecker();
     function reportPremiumProps(props) {
       for (const prop of PREMIUM_FORBIDDEN) {
@@ -398,7 +360,7 @@ var no_conflicting_button_props_default = createRule({
 });
 
 // src/rules/no-discord-limit-exceeded.ts
-var import_utils13 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES5, ESLintUtils as ESLintUtils4 } from "@typescript-eslint/utils";
 var LIMITS = [
   {
     builders: /* @__PURE__ */ new Set(["ActionRowBuilder"]),
@@ -454,7 +416,7 @@ function spreadCount(spread, services, checker) {
 function arrayLength(array, services, checker) {
   let count = 0;
   for (const element of array.elements) {
-    if (element?.type === import_utils13.AST_NODE_TYPES.SpreadElement) {
+    if (element?.type === AST_NODE_TYPES5.SpreadElement) {
       const arity = spreadCount(element, services, checker);
       if (arity === void 0) return void 0;
       count += arity;
@@ -467,14 +429,14 @@ function arrayLength(array, services, checker) {
 function callItems(call, services, checker) {
   const first = call.arguments[0];
   if (first === void 0) return 0;
-  if (first.type === import_utils13.AST_NODE_TYPES.ArrayExpression) return arrayLength(first, services, checker);
-  if (first.type !== import_utils13.AST_NODE_TYPES.SpreadElement) {
+  if (first.type === AST_NODE_TYPES5.ArrayExpression) return arrayLength(first, services, checker);
+  if (first.type !== AST_NODE_TYPES5.SpreadElement) {
     const type = services.getTypeAtLocation(first);
     if (checker.isArrayLikeType(type)) return tupleLength(type, checker);
   }
   let count = 0;
   for (const arg of call.arguments) {
-    if (arg.type === import_utils13.AST_NODE_TYPES.SpreadElement) {
+    if (arg.type === AST_NODE_TYPES5.SpreadElement) {
       const arity = spreadCount(arg, services, checker);
       if (arity === void 0) return void 0;
       count += arity;
@@ -489,7 +451,7 @@ function countStaticItems(calls, limit, data, services, checker) {
   let matched = false;
   const seed = data !== void 0 && limit.dataKey !== void 0 ? getProperty(data, limit.dataKey) : void 0;
   if (seed !== void 0) {
-    const length = seed.value.type === import_utils13.AST_NODE_TYPES.ArrayExpression ? arrayLength(seed.value, services, checker) : tupleLength(services.getTypeAtLocation(seed.value), checker);
+    const length = seed.value.type === AST_NODE_TYPES5.ArrayExpression ? arrayLength(seed.value, services, checker) : tupleLength(services.getTypeAtLocation(seed.value), checker);
     if (length === void 0) return void 0;
     count = length;
     matched = true;
@@ -518,7 +480,7 @@ var no_discord_limit_exceeded_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils13.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils4.getParserServices(context);
     const checker = services.program.getTypeChecker();
     function check(anchor, calls, root) {
       const rawData = constructorData(root);
@@ -549,11 +511,11 @@ var no_discord_limit_exceeded_default = createRule({
 });
 
 // src/rules/no-mixed-message-format.ts
-var import_utils15 = require("@typescript-eslint/utils");
-var import_typescript2 = require("typescript");
+import { AST_NODE_TYPES as AST_NODE_TYPES6, ESLintUtils as ESLintUtils5 } from "@typescript-eslint/utils";
+import { SymbolFlags as SymbolFlags2, TypeFlags as TypeFlags2 } from "typescript";
 var CONTENT_FIELDS = ["content", "embeds", "poll", "stickers", "sticker_ids"];
 function isDefinitelyUndefined(type) {
-  return (type.flags & import_typescript2.TypeFlags.Undefined) !== 0;
+  return (type.flags & TypeFlags2.Undefined) !== 0;
 }
 var no_mixed_message_format_default = createRule({
   name: "no-mixed-message-format",
@@ -569,15 +531,15 @@ var no_mixed_message_format_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils15.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils5.getParserServices(context);
     const checker = services.program.getTypeChecker();
     function spreadHasContent(node) {
       for (const prop of node.properties) {
-        if (prop.type !== import_utils15.AST_NODE_TYPES.SpreadElement) continue;
+        if (prop.type !== AST_NODE_TYPES6.SpreadElement) continue;
         const type = services.getTypeAtLocation(prop.argument);
         const carries = CONTENT_FIELDS.some((name) => {
           const symbol = type.getProperty(name);
-          if (symbol === void 0 || (symbol.flags & import_typescript2.SymbolFlags.Optional) !== 0) return false;
+          if (symbol === void 0 || (symbol.flags & SymbolFlags2.Optional) !== 0) return false;
           return !isDefinitelyUndefined(checker.getTypeOfSymbol(symbol));
         });
         if (carries) return true;
@@ -602,37 +564,37 @@ var no_mixed_message_format_default = createRule({
 });
 
 // src/rules/prefer-ephemeral-flag.ts
-var import_utils17 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES7, ESLintUtils as ESLintUtils6 } from "@typescript-eslint/utils";
 var REPLY_METHODS = /* @__PURE__ */ new Set(["reply", "deferReply", "followUp"]);
 function propertyName(property) {
-  if (property.type !== import_utils17.AST_NODE_TYPES.Property || property.computed) return void 0;
-  if (property.key.type === import_utils17.AST_NODE_TYPES.Identifier) return property.key.name;
+  if (property.type !== AST_NODE_TYPES7.Property || property.computed) return void 0;
+  if (property.key.type === AST_NODE_TYPES7.Identifier) return property.key.name;
   return typeof property.key.value === "string" ? property.key.value : void 0;
 }
 function resolveOptions(sourceCode, arg) {
-  if (arg?.type === import_utils17.AST_NODE_TYPES.ObjectExpression) return arg;
-  if (arg?.type !== import_utils17.AST_NODE_TYPES.Identifier) return void 0;
+  if (arg?.type === AST_NODE_TYPES7.ObjectExpression) return arg;
+  if (arg?.type !== AST_NODE_TYPES7.Identifier) return void 0;
   const init = resolveConstInit(sourceCode, arg);
-  return init?.type === import_utils17.AST_NODE_TYPES.ObjectExpression ? init : void 0;
+  return init?.type === AST_NODE_TYPES7.ObjectExpression ? init : void 0;
 }
 function canReplaceEphemeral(ephemeral, options, messageFlagsAlias) {
   const hasFlags = options.properties.some((property) => propertyName(property) === "flags");
-  const hasSpread = options.properties.some((property) => property.type === import_utils17.AST_NODE_TYPES.SpreadElement);
-  const isTrue = ephemeral.value.type === import_utils17.AST_NODE_TYPES.Literal && ephemeral.value.value === true;
+  const hasSpread = options.properties.some((property) => property.type === AST_NODE_TYPES7.SpreadElement);
+  const isTrue = ephemeral.value.type === AST_NODE_TYPES7.Literal && ephemeral.value.value === true;
   return messageFlagsAlias !== void 0 && !hasFlags && !hasSpread && isTrue;
 }
 function destructuredReply(node, sourceCode) {
-  if (node.callee.type !== import_utils17.AST_NODE_TYPES.Identifier) return void 0;
+  if (node.callee.type !== AST_NODE_TYPES7.Identifier) return void 0;
   const calleeId = node.callee;
   const variable = sourceCode.getScope(node).references.find((ref) => ref.identifier === calleeId)?.resolved;
   const def = variable?.defs[0];
-  if (def?.node.type !== import_utils17.AST_NODE_TYPES.VariableDeclarator) return void 0;
+  if (def?.node.type !== AST_NODE_TYPES7.VariableDeclarator) return void 0;
   const { id: pattern, init } = def.node;
-  if (pattern.type !== import_utils17.AST_NODE_TYPES.ObjectPattern || !init) return void 0;
+  if (pattern.type !== AST_NODE_TYPES7.ObjectPattern || !init) return void 0;
   const prop = pattern.properties.find(
-    (p) => p.type === import_utils17.AST_NODE_TYPES.Property && !p.computed && p.key.type === import_utils17.AST_NODE_TYPES.Identifier && p.value.type === import_utils17.AST_NODE_TYPES.Identifier && p.value.name === calleeId.name
+    (p) => p.type === AST_NODE_TYPES7.Property && !p.computed && p.key.type === AST_NODE_TYPES7.Identifier && p.value.type === AST_NODE_TYPES7.Identifier && p.value.name === calleeId.name
   );
-  if (prop?.key.type !== import_utils17.AST_NODE_TYPES.Identifier) return void 0;
+  if (prop?.key.type !== AST_NODE_TYPES7.Identifier) return void 0;
   return { name: prop.key.name, init };
 }
 var prefer_ephemeral_flag_default = createRule({
@@ -650,14 +612,14 @@ var prefer_ephemeral_flag_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils17.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils6.getParserServices(context);
     const checker = services.program.getTypeChecker();
     let messageFlagsAlias;
     return {
       ImportDeclaration(node) {
         if (node.source.value !== "discord.js") return;
         for (const spec of node.specifiers) {
-          if (spec.type === import_utils17.AST_NODE_TYPES.ImportSpecifier && spec.imported.type === import_utils17.AST_NODE_TYPES.Identifier && spec.imported.name === "MessageFlags") {
+          if (spec.type === AST_NODE_TYPES7.ImportSpecifier && spec.imported.type === AST_NODE_TYPES7.Identifier && spec.imported.name === "MessageFlags") {
             messageFlagsAlias = spec.local.name;
           }
         }
@@ -665,7 +627,7 @@ var prefer_ephemeral_flag_default = createRule({
       CallExpression(node) {
         let name;
         let receiverType;
-        if (node.callee.type === import_utils17.AST_NODE_TYPES.MemberExpression) {
+        if (node.callee.type === AST_NODE_TYPES7.MemberExpression) {
           name = methodName(node);
           receiverType = services.getTypeAtLocation(node.callee.object);
         } else {
@@ -678,7 +640,7 @@ var prefer_ephemeral_flag_default = createRule({
         const options = resolveOptions(context.sourceCode, node.arguments[0]);
         if (options === void 0) return;
         const ephemeral = options.properties.find((property) => propertyName(property) === "ephemeral");
-        if (ephemeral?.type !== import_utils17.AST_NODE_TYPES.Property) return;
+        if (ephemeral?.type !== AST_NODE_TYPES7.Property) return;
         const canFix = canReplaceEphemeral(ephemeral, options, messageFlagsAlias);
         context.report({
           node: ephemeral,
@@ -691,7 +653,7 @@ var prefer_ephemeral_flag_default = createRule({
 });
 
 // src/rules/prefer-v2-component.ts
-var import_utils19 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES8, ESLintUtils as ESLintUtils7 } from "@typescript-eslint/utils";
 var prefer_v2_component_default = createRule({
   name: "prefer-v2-component",
   meta: {
@@ -706,7 +668,7 @@ var prefer_v2_component_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils19.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils7.getParserServices(context);
     const checker = services.program.getTypeChecker();
     return {
       NewExpression(node) {
@@ -716,8 +678,8 @@ var prefer_v2_component_default = createRule({
       },
       // EmbedBuilder.from() is a static factory that returns an embed without `new`
       CallExpression(node) {
-        if (node.callee.type !== import_utils19.AST_NODE_TYPES.MemberExpression) return;
-        if (node.callee.property.type !== import_utils19.AST_NODE_TYPES.Identifier || node.callee.property.name !== "from") {
+        if (node.callee.type !== AST_NODE_TYPES8.MemberExpression) return;
+        if (node.callee.property.type !== AST_NODE_TYPES8.Identifier || node.callee.property.name !== "from") {
           return;
         }
         if (extendsDjsType(checker, services.getTypeAtLocation(node.callee.object), "EmbedBuilder")) {
@@ -747,29 +709,29 @@ var prefer_v2_component_default = createRule({
 });
 
 // src/rules/require-button-props.ts
-var import_utils21 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES9, ESLintUtils as ESLintUtils8 } from "@typescript-eslint/utils";
 function isDjsConsumption(call, arg, info) {
-  if (call.callee.type !== import_utils21.AST_NODE_TYPES.MemberExpression) return false;
+  if (call.callee.type !== AST_NODE_TYPES9.MemberExpression) return false;
   if (!call.arguments.includes(arg)) return false;
   return isFromDiscordJs(info.services.getTypeAtLocation(call.callee.object).getSymbol());
 }
 function referenceCalls(id, info) {
   const top = enclosingChainTop(id);
-  if (top !== id && top.type === import_utils21.AST_NODE_TYPES.CallExpression) {
+  if (top !== id && top.type === AST_NODE_TYPES9.CallExpression) {
     const calls = collectChain(top);
     if (!extendsDjsType(info.checker, info.services.getTypeAtLocation(top), "ButtonBuilder")) return calls;
     const sealed = outermostAssertion(top);
-    if (sealed.parent.type === import_utils21.AST_NODE_TYPES.ExpressionStatement) return calls;
-    if (sealed.parent.type === import_utils21.AST_NODE_TYPES.CallExpression && isDjsConsumption(sealed.parent, sealed, info)) {
+    if (sealed.parent.type === AST_NODE_TYPES9.ExpressionStatement) return calls;
+    if (sealed.parent.type === AST_NODE_TYPES9.CallExpression && isDjsConsumption(sealed.parent, sealed, info)) {
       return calls;
     }
     return void 0;
   }
   const wrapped = outermostAssertion(id);
-  if (wrapped.parent.type === import_utils21.AST_NODE_TYPES.CallExpression && isDjsConsumption(wrapped.parent, wrapped, info)) {
+  if (wrapped.parent.type === AST_NODE_TYPES9.CallExpression && isDjsConsumption(wrapped.parent, wrapped, info)) {
     return methodName(wrapped.parent) === "from" ? void 0 : [];
   }
-  if (id.parent.type === import_utils21.AST_NODE_TYPES.ExportSpecifier || id.parent.type === import_utils21.AST_NODE_TYPES.ExportDefaultDeclaration) {
+  if (id.parent.type === AST_NODE_TYPES9.ExportSpecifier || id.parent.type === AST_NODE_TYPES9.ExportDefaultDeclaration) {
     return [];
   }
   return void 0;
@@ -780,7 +742,7 @@ function completionCalls(declarator, info) {
   const chains = [];
   for (const ref of variable.references) {
     if (ref.init) continue;
-    if (ref.isWrite() || ref.identifier.type !== import_utils21.AST_NODE_TYPES.Identifier) return void 0;
+    if (ref.isWrite() || ref.identifier.type !== AST_NODE_TYPES9.Identifier) return void 0;
     const calls = referenceCalls(ref.identifier, info);
     if (calls === void 0) return void 0;
     chains.push(calls);
@@ -788,15 +750,15 @@ function completionCalls(declarator, info) {
   return chains.reverse().flat();
 }
 function reachableCalls(top, info) {
-  const calls = top.type === import_utils21.AST_NODE_TYPES.CallExpression ? collectChain(top) : [];
+  const calls = top.type === AST_NODE_TYPES9.CallExpression ? collectChain(top) : [];
   const sealed = outermostAssertion(top);
   const parent = sealed.parent;
-  if (parent.type === import_utils21.AST_NODE_TYPES.VariableDeclarator && parent.id.type === import_utils21.AST_NODE_TYPES.Identifier) {
+  if (parent.type === AST_NODE_TYPES9.VariableDeclarator && parent.id.type === AST_NODE_TYPES9.Identifier) {
     const later = completionCalls(parent, info);
     return later === void 0 ? void 0 : [...later, ...calls];
   }
-  if (parent.type === import_utils21.AST_NODE_TYPES.ExpressionStatement) return calls;
-  if (parent.type === import_utils21.AST_NODE_TYPES.CallExpression && isDjsConsumption(parent, sealed, info)) return calls;
+  if (parent.type === AST_NODE_TYPES9.ExpressionStatement) return calls;
+  if (parent.type === AST_NODE_TYPES9.CallExpression && isDjsConsumption(parent, sealed, info)) return calls;
   return void 0;
 }
 var require_button_props_default = createRule({
@@ -817,7 +779,7 @@ var require_button_props_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils21.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils8.getParserServices(context);
     const info = { services, checker: services.program.getTypeChecker(), sourceCode: context.sourceCode };
     function reportMissing(anchor, style, facts) {
       const { props } = facts;
@@ -841,7 +803,7 @@ var require_button_props_default = createRule({
         if (!isFromDiscordJs(type.getSymbol()) || !extendsDjsType(info.checker, type, "ButtonBuilder")) return;
         const data = constructorData(node);
         if (node.arguments.length > 0 && data === void 0) return;
-        if (data?.properties.some((p) => p.type === import_utils21.AST_NODE_TYPES.SpreadElement) === true) return;
+        if (data?.properties.some((p) => p.type === AST_NODE_TYPES9.SpreadElement) === true) return;
         const top = enclosingChainTop(node);
         const calls = reachableCalls(top, info);
         if (calls === void 0) return;
@@ -859,7 +821,7 @@ var require_button_props_default = createRule({
 });
 
 // src/rules/require-components-v2-flag.ts
-var import_utils23 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES10, ESLintUtils as ESLintUtils9 } from "@typescript-eslint/utils";
 var IS_COMPONENTS_V2 = 32768;
 function combine(states) {
   const [first] = states;
@@ -909,13 +871,13 @@ function applyBitwise(operator, left, right) {
 }
 function foldToNumber(node, services) {
   switch (node.type) {
-    case import_utils23.AST_NODE_TYPES.Literal: {
+    case AST_NODE_TYPES10.Literal: {
       return typeof node.value === "number" ? node.value : void 0;
     }
-    case import_utils23.AST_NODE_TYPES.TSAsExpression: {
+    case AST_NODE_TYPES10.TSAsExpression: {
       return foldToNumber(node.expression, services);
     }
-    case import_utils23.AST_NODE_TYPES.UnaryExpression: {
+    case AST_NODE_TYPES10.UnaryExpression: {
       const value = foldToNumber(node.argument, services);
       if (value === void 0) return void 0;
       if (node.operator === "-") return -value;
@@ -923,14 +885,14 @@ function foldToNumber(node, services) {
       if (node.operator === "+") return value;
       return void 0;
     }
-    case import_utils23.AST_NODE_TYPES.BinaryExpression: {
+    case AST_NODE_TYPES10.BinaryExpression: {
       const left = foldToNumber(node.left, services);
       const right = foldToNumber(node.right, services);
       if (left === void 0 || right === void 0) return void 0;
       return applyBitwise(node.operator, left, right);
     }
-    case import_utils23.AST_NODE_TYPES.Identifier:
-    case import_utils23.AST_NODE_TYPES.MemberExpression: {
+    case AST_NODE_TYPES10.Identifier:
+    case AST_NODE_TYPES10.MemberExpression: {
       const type = services.getTypeAtLocation(node);
       return type.isNumberLiteral() ? type.value : void 0;
     }
@@ -945,11 +907,11 @@ function elementState(node, services) {
   return flagTypeState(services.getTypeAtLocation(node));
 }
 function flagValueState(value, services) {
-  if (value.type === import_utils23.AST_NODE_TYPES.ArrayExpression) {
+  if (value.type === AST_NODE_TYPES10.ArrayExpression) {
     const states = new Set(
       value.elements.map((element) => {
         if (element === null) return "absent";
-        if (element.type === import_utils23.AST_NODE_TYPES.SpreadElement) {
+        if (element.type === AST_NODE_TYPES10.SpreadElement) {
           return flagTypeState(services.getTypeAtLocation(element.argument).getNumberIndexType());
         }
         return elementState(element, services);
@@ -963,9 +925,9 @@ function flagValueState(value, services) {
 function flagState(node, services, checker) {
   let state = "absent";
   for (const prop of node.properties) {
-    if (prop.type === import_utils23.AST_NODE_TYPES.Property && propertyKeyIs(prop, "flags")) {
+    if (prop.type === AST_NODE_TYPES10.Property && propertyKeyIs(prop, "flags")) {
       state = flagValueState(prop.value, services);
-    } else if (prop.type === import_utils23.AST_NODE_TYPES.SpreadElement) {
+    } else if (prop.type === AST_NODE_TYPES10.SpreadElement) {
       const symbol = services.getTypeAtLocation(prop.argument).getProperty("flags");
       if (symbol !== void 0) state = flagTypeState(checker.getTypeOfSymbol(symbol));
     }
@@ -992,7 +954,7 @@ var require_components_v2_flag_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils23.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils9.getParserServices(context);
     const checker = services.program.getTypeChecker();
     const reportedInits = /* @__PURE__ */ new Set();
     function payloadViolates(node) {
@@ -1011,9 +973,9 @@ var require_components_v2_flag_default = createRule({
       // an unannotated payload has no contextual type until the call site
       CallExpression(node) {
         for (const arg of node.arguments) {
-          if (arg.type !== import_utils23.AST_NODE_TYPES.Identifier) continue;
+          if (arg.type !== AST_NODE_TYPES10.Identifier) continue;
           const init = resolveConstInit(context.sourceCode, arg);
-          if (init?.type !== import_utils23.AST_NODE_TYPES.ObjectExpression) continue;
+          if (init?.type !== AST_NODE_TYPES10.ObjectExpression) continue;
           if (contextualType(init) !== void 0) continue;
           if (reportedInits.has(init)) continue;
           const contextual = contextualType(arg);
@@ -1029,7 +991,7 @@ var require_components_v2_flag_default = createRule({
 });
 
 // src/rules/required-option-before-optional.ts
-var import_utils25 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES11, ESLintUtils as ESLintUtils10 } from "@typescript-eslint/utils";
 var SLASH_COMMAND_BUILDERS = /* @__PURE__ */ new Set(["SlashCommandBuilder", "SlashCommandSubcommandBuilder"]);
 var ADD_OPTION = /* @__PURE__ */ new Set([
   "addStringOption",
@@ -1043,25 +1005,25 @@ var ADD_OPTION = /* @__PURE__ */ new Set([
   "addAttachmentOption"
 ]);
 function optionChain(callback) {
-  if (callback?.type !== import_utils25.AST_NODE_TYPES.ArrowFunctionExpression && callback?.type !== import_utils25.AST_NODE_TYPES.FunctionExpression) {
+  if (callback?.type !== AST_NODE_TYPES11.ArrowFunctionExpression && callback?.type !== AST_NODE_TYPES11.FunctionExpression) {
     return void 0;
   }
-  if (callback.body.type !== import_utils25.AST_NODE_TYPES.BlockStatement) return callback.body;
+  if (callback.body.type !== AST_NODE_TYPES11.BlockStatement) return callback.body;
   for (const statement of callback.body.body) {
-    if (statement.type === import_utils25.AST_NODE_TYPES.ReturnStatement) return statement.argument ?? void 0;
+    if (statement.type === AST_NODE_TYPES11.ReturnStatement) return statement.argument ?? void 0;
   }
   return void 0;
 }
 function optionRequiredState(callback, services, checker) {
   const chain = optionChain(callback);
-  if (chain?.type !== import_utils25.AST_NODE_TYPES.CallExpression) return "unknown";
+  if (chain?.type !== AST_NODE_TYPES11.CallExpression) return "unknown";
   const setRequired = collectChain(chain).find((call) => methodName(call) === "setRequired");
   if (!setRequired) return "optional";
   const arg = setRequired.arguments[0];
-  if (arg?.type === import_utils25.AST_NODE_TYPES.Literal && typeof arg.value === "boolean") {
+  if (arg?.type === AST_NODE_TYPES11.Literal && typeof arg.value === "boolean") {
     return arg.value ? "required" : "optional";
   }
-  if (arg === void 0 || arg.type === import_utils25.AST_NODE_TYPES.SpreadElement) return "unknown";
+  if (arg === void 0 || arg.type === AST_NODE_TYPES11.SpreadElement) return "unknown";
   const value = booleanLiteralValue(checker, services.getTypeAtLocation(arg));
   if (value === void 0) return "unknown";
   return value ? "required" : "optional";
@@ -1080,7 +1042,7 @@ var required_option_before_optional_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils25.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils10.getParserServices(context);
     const checker = services.program.getTypeChecker();
     return {
       CallExpression(node) {
@@ -1095,7 +1057,7 @@ var required_option_before_optional_default = createRule({
           if (state === "optional") {
             seenOptional = true;
           } else if (seenOptional) {
-            const target = call.callee.type === import_utils25.AST_NODE_TYPES.MemberExpression ? call.callee.property : call;
+            const target = call.callee.type === AST_NODE_TYPES11.MemberExpression ? call.callee.property : call;
             context.report({ node: target, messageId: "outOfOrder" });
             return;
           }
@@ -1106,7 +1068,7 @@ var required_option_before_optional_default = createRule({
 });
 
 // src/rules/select-menu-min-exceeds-max.ts
-var import_utils27 = require("@typescript-eslint/utils");
+import { ESLintUtils as ESLintUtils11 } from "@typescript-eslint/utils";
 function boundOf(calls, data, method, key, camelKey) {
   const call = lastCall(calls, method);
   if (call !== void 0) return { source: call.arguments[0], site: calleeProperty(call) };
@@ -1128,7 +1090,7 @@ var select_menu_min_exceeds_max_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils27.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils11.getParserServices(context);
     const checker = services.program.getTypeChecker();
     function check(calls, root) {
       const rawData = constructorData(root);
@@ -1159,7 +1121,7 @@ var select_menu_min_exceeds_max_default = createRule({
 });
 
 // src/rules/valid-command-name.ts
-var import_utils29 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES12, ESLintUtils as ESLintUtils12 } from "@typescript-eslint/utils";
 var SLASH_BUILDERS = /* @__PURE__ */ new Set([
   "SlashCommandBuilder",
   "SlashCommandSubcommandBuilder",
@@ -1178,8 +1140,8 @@ function isValidChatInputName(name) {
   return /^[\p{Ll}\p{Lm}\p{Lo}\p{N}\p{sc=Devanagari}\p{sc=Thai}_-]{1,32}$/u.test(name);
 }
 function staticName(arg) {
-  if (arg.type === import_utils29.AST_NODE_TYPES.Literal && typeof arg.value === "string") return arg.value;
-  if (arg.type === import_utils29.AST_NODE_TYPES.TemplateLiteral && arg.expressions.length === 0) {
+  if (arg.type === AST_NODE_TYPES12.Literal && typeof arg.value === "string") return arg.value;
+  if (arg.type === AST_NODE_TYPES12.TemplateLiteral && arg.expressions.length === 0) {
     return arg.quasis[0]?.value.cooked ?? void 0;
   }
   return void 0;
@@ -1198,19 +1160,19 @@ var valid_command_name_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils29.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils12.getParserServices(context);
     return {
       CallExpression(node) {
         if (methodName(node) !== "setName") return;
         const arg = node.arguments[0];
         if (arg === void 0) return;
         let name = staticName(arg);
-        if (name === void 0 && (arg.type === import_utils29.AST_NODE_TYPES.Identifier || arg.type === import_utils29.AST_NODE_TYPES.MemberExpression)) {
+        if (name === void 0 && (arg.type === AST_NODE_TYPES12.Identifier || arg.type === AST_NODE_TYPES12.MemberExpression)) {
           const argType = services.getTypeAtLocation(arg);
           if (argType.isStringLiteral()) name = argType.value;
         }
         if (name === void 0 || isValidChatInputName(name)) return;
-        if (node.callee.type !== import_utils29.AST_NODE_TYPES.MemberExpression) return;
+        if (node.callee.type !== AST_NODE_TYPES12.MemberExpression) return;
         const checker = services.program.getTypeChecker();
         const receiverType = services.getTypeAtLocation(node.callee.object);
         if (!extendsDjsType(checker, receiverType, SLASH_BUILDERS)) return;
@@ -1221,7 +1183,7 @@ var valid_command_name_default = createRule({
 });
 
 // src/rules/valid-command-description.ts
-var import_utils31 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES13, ESLintUtils as ESLintUtils13 } from "@typescript-eslint/utils";
 var SLASH_BUILDERS2 = /* @__PURE__ */ new Set([
   "SlashCommandBuilder",
   "SlashCommandSubcommandBuilder",
@@ -1237,8 +1199,8 @@ var SLASH_BUILDERS2 = /* @__PURE__ */ new Set([
   "SlashCommandAttachmentOption"
 ]);
 function staticString(arg) {
-  if (arg.type === import_utils31.AST_NODE_TYPES.Literal && typeof arg.value === "string") return arg.value;
-  if (arg.type === import_utils31.AST_NODE_TYPES.TemplateLiteral && arg.expressions.length === 0) {
+  if (arg.type === AST_NODE_TYPES13.Literal && typeof arg.value === "string") return arg.value;
+  if (arg.type === AST_NODE_TYPES13.TemplateLiteral && arg.expressions.length === 0) {
     return arg.quasis[0]?.value.cooked ?? void 0;
   }
   return void 0;
@@ -1258,19 +1220,19 @@ var valid_command_description_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils31.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils13.getParserServices(context);
     return {
       CallExpression(node) {
         if (methodName(node) !== "setDescription") return;
         const arg = node.arguments[0];
         if (arg === void 0) return;
         let desc = staticString(arg);
-        if (desc === void 0 && (arg.type === import_utils31.AST_NODE_TYPES.Identifier || arg.type === import_utils31.AST_NODE_TYPES.MemberExpression)) {
+        if (desc === void 0 && (arg.type === AST_NODE_TYPES13.Identifier || arg.type === AST_NODE_TYPES13.MemberExpression)) {
           const argType = services.getTypeAtLocation(arg);
           if (argType.isStringLiteral()) desc = argType.value;
         }
         if (desc === void 0) return;
-        if (node.callee.type !== import_utils31.AST_NODE_TYPES.MemberExpression) return;
+        if (node.callee.type !== AST_NODE_TYPES13.MemberExpression) return;
         const checker = services.program.getTypeChecker();
         const receiverType = services.getTypeAtLocation(node.callee.object);
         if (!extendsDjsType(checker, receiverType, SLASH_BUILDERS2)) return;
@@ -1285,10 +1247,10 @@ var valid_command_description_default = createRule({
 });
 
 // src/rules/valid-label-length.ts
-var import_utils33 = require("@typescript-eslint/utils");
+import { AST_NODE_TYPES as AST_NODE_TYPES14, ESLintUtils as ESLintUtils14 } from "@typescript-eslint/utils";
 function staticString2(arg) {
-  if (arg.type === import_utils33.AST_NODE_TYPES.Literal && typeof arg.value === "string") return arg.value;
-  if (arg.type === import_utils33.AST_NODE_TYPES.TemplateLiteral && arg.expressions.length === 0) {
+  if (arg.type === AST_NODE_TYPES14.Literal && typeof arg.value === "string") return arg.value;
+  if (arg.type === AST_NODE_TYPES14.TemplateLiteral && arg.expressions.length === 0) {
     return arg.quasis[0]?.value.cooked ?? void 0;
   }
   return void 0;
@@ -1308,19 +1270,19 @@ var valid_label_length_default = createRule({
   },
   defaultOptions: [],
   create(context) {
-    const services = import_utils33.ESLintUtils.getParserServices(context);
+    const services = ESLintUtils14.getParserServices(context);
     return {
       CallExpression(node) {
         if (methodName(node) !== "setLabel") return;
         const arg = node.arguments[0];
         if (arg === void 0) return;
         let label = staticString2(arg);
-        if (label === void 0 && (arg.type === import_utils33.AST_NODE_TYPES.Identifier || arg.type === import_utils33.AST_NODE_TYPES.MemberExpression)) {
+        if (label === void 0 && (arg.type === AST_NODE_TYPES14.Identifier || arg.type === AST_NODE_TYPES14.MemberExpression)) {
           const argType = services.getTypeAtLocation(arg);
           if (argType.isStringLiteral()) label = argType.value;
         }
         if (label === void 0) return;
-        if (node.callee.type !== import_utils33.AST_NODE_TYPES.MemberExpression) return;
+        if (node.callee.type !== AST_NODE_TYPES14.MemberExpression) return;
         const checker = services.program.getTypeChecker();
         const receiverType = services.getTypeAtLocation(node.callee.object);
         if (!extendsDjsType(checker, receiverType, "LabelBuilder")) return;
@@ -1335,7 +1297,7 @@ var valid_label_length_default = createRule({
 });
 
 // src/index.ts
-var tseslintParser = __toESM(require("@typescript-eslint/parser"), 1);
+import * as tseslintParser from "@typescript-eslint/parser";
 var rules = {
   "no-choices-and-autocomplete": no_choices_and_autocomplete_default,
   "no-conflicting-button-props": no_conflicting_button_props_default,
@@ -1397,9 +1359,10 @@ function createSharedProgramConfig(program, tsconfigRootDir) {
 }
 plugin.configs = { recommended };
 var index_default = plugin;
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+
+export {
+  recommended,
   createSharedProgramConfig,
-  recommended
-});
-//# sourceMappingURL=index.cjs.map
+  index_default
+};
+//# sourceMappingURL=chunk-V6AEHW3E.js.map

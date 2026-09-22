@@ -32,7 +32,7 @@ const rules = {
 } satisfies Record<string, TSESLint.RuleModule<string, readonly unknown[]>>;
 
 const plugin: TSESLint.FlatConfig.Plugin = {
-    meta: { name: '@vybebot/eslint-plugin-discord', version: '1.0.0' },
+    meta: { name: '@vybebot/eslint-plugin-discord', version: '1.1.0' },
     rules
 };
 
@@ -59,6 +59,29 @@ export const recommended: TSESLint.FlatConfig.ConfigArray = [
         rules: presetRules
     }
 ];
+
+export function createSharedProgramConfig(
+    program: unknown,
+    tsconfigRootDir?: string
+): TSESLint.FlatConfig.ConfigArray {
+    return [
+        {
+            files: ['**/*.ts', '**/*.mts', '**/*.cts', '**/*.tsx'],
+            plugins: {
+                '@vybebot/discord': plugin,
+                discord: plugin
+            },
+            languageOptions: {
+                parser: tseslintParser,
+                parserOptions: {
+                    programs: [program as any],
+                    ...(tsconfigRootDir ? { tsconfigRootDir } : {})
+                }
+            },
+            rules: presetRules
+        }
+    ];
+}
 
 plugin.configs = { recommended };
 

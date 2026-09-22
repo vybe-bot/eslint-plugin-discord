@@ -27,14 +27,17 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/index.ts
-var index_exports = {};
-__export(index_exports, {
-  createSharedProgramConfig: () => createSharedProgramConfig,
-  default: () => index_default,
-  recommended: () => recommended
+// src/cli.ts
+var cli_exports = {};
+__export(cli_exports, {
+  parseArgs: () => parseArgs,
+  runCli: () => runCli
 });
-module.exports = __toCommonJS(index_exports);
+module.exports = __toCommonJS(cli_exports);
+var path = __toESM(require("path"), 1);
+var process = __toESM(require("process"), 1);
+var import_typescript3 = __toESM(require("typescript"), 1);
+var import_eslint = require("eslint");
 
 // src/utils/componentsV2.ts
 var import_utils4 = require("@typescript-eslint/utils");
@@ -1396,10 +1399,126 @@ function createSharedProgramConfig(program, tsconfigRootDir) {
   ];
 }
 plugin.configs = { recommended };
-var index_default = plugin;
+
+// src/cli.ts
+function parseArgs(args) {
+  let projectDir = process.cwd();
+  let tsconfigPath = "";
+  let help = false;
+  let version = false;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "-h" || arg === "--help") {
+      help = true;
+    } else if (arg === "-v" || arg === "--version") {
+      version = true;
+    } else if (arg === "-p" || arg === "--project") {
+      const next = args[++i];
+      if (next) {
+        if (next.endsWith(".json")) {
+          tsconfigPath = path.resolve(next);
+          projectDir = path.dirname(tsconfigPath);
+        } else {
+          projectDir = path.resolve(next);
+        }
+      }
+    } else if (!arg.startsWith("-")) {
+      projectDir = path.resolve(arg);
+    }
+  }
+  if (!tsconfigPath) {
+    const found = import_typescript3.default.findConfigFile(projectDir, import_typescript3.default.sys.fileExists, "tsconfig.json");
+    tsconfigPath = found ?? path.join(projectDir, "tsconfig.json");
+  }
+  return {
+    options: { projectDir, tsconfigPath },
+    help,
+    version
+  };
+}
+async function runCli(args = process.argv.slice(2)) {
+  const { options, help, version } = parseArgs(args);
+  if (help) {
+    console.log(`Usage: discord-check [options] [path]
+
+Single-pass TypeScript typecheck + Discord API rule validator.
+
+Options:
+  -p, --project <path>   Path to tsconfig.json or project directory
+  -v, --version          Show version
+  -h, --help             Show this help message
+`);
+    return 0;
+  }
+  if (version) {
+    console.log("1.1.0");
+    return 0;
+  }
+  if (!import_typescript3.default.sys.fileExists(options.tsconfigPath)) {
+    console.error(`Error: Cannot find tsconfig file at ${options.tsconfigPath}`);
+    return 1;
+  }
+  const configFile = import_typescript3.default.readConfigFile(options.tsconfigPath, import_typescript3.default.sys.readFile);
+  if (configFile.error) {
+    console.error(
+      import_typescript3.default.formatDiagnostic(configFile.error, {
+        getCanonicalFileName: (f) => f,
+        getCurrentDirectory: () => options.projectDir,
+        getNewLine: () => "\n"
+      })
+    );
+    return 1;
+  }
+  const parsedConfig = import_typescript3.default.parseJsonConfigFileContent(
+    configFile.config,
+    import_typescript3.default.sys,
+    path.dirname(options.tsconfigPath),
+    { noEmit: true },
+    options.tsconfigPath
+  );
+  const program = import_typescript3.default.createProgram(parsedConfig.fileNames, parsedConfig.options);
+  const tsDiagnostics = import_typescript3.default.getPreEmitDiagnostics(program);
+  const eslint = new import_eslint.ESLint({
+    overrideConfigFile: true,
+    overrideConfig: createSharedProgramConfig(program, path.dirname(options.tsconfigPath))
+  });
+  const eslintResults = await eslint.lintFiles(parsedConfig.fileNames);
+  let errorCount = 0;
+  let warningCount = 0;
+  const formatHost = {
+    getCanonicalFileName: (fileName) => fileName,
+    getCurrentDirectory: () => options.projectDir,
+    getNewLine: () => "\n"
+  };
+  for (const diag of tsDiagnostics) {
+    if (diag.category === import_typescript3.default.DiagnosticCategory.Error) {
+      errorCount++;
+    } else if (diag.category === import_typescript3.default.DiagnosticCategory.Warning) {
+      warningCount++;
+    }
+    console.error(import_typescript3.default.formatDiagnosticsWithColorAndContext([diag], formatHost).trimEnd());
+  }
+  for (const res of eslintResults) {
+    const relPath = path.relative(options.projectDir, res.filePath).replace(/\\/g, "/");
+    for (const msg of res.messages) {
+      if (msg.severity === 2) {
+        errorCount++;
+      } else if (msg.severity === 1) {
+        warningCount++;
+      }
+      const severityLabel = msg.severity === 2 ? "error" : "warning";
+      const ruleId = msg.ruleId ?? "ESLINT";
+      console.error(`${relPath}:${msg.line}:${msg.column} - ${severityLabel} TS9001: [${ruleId}] ${msg.message}`);
+    }
+  }
+  if (errorCount > 0) {
+    return 1;
+  }
+  return 0;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  createSharedProgramConfig,
-  recommended
+  parseArgs,
+  runCli
 });
-//# sourceMappingURL=index.cjs.map
+//# sourceMappingURL=cli.cjs.map
