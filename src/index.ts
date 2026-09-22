@@ -32,7 +32,7 @@ const rules = {
 } satisfies Record<string, TSESLint.RuleModule<string, readonly unknown[]>>;
 
 const plugin: TSESLint.FlatConfig.Plugin = {
-    meta: { name: '@vybe-bot/eslint-plugin-discord', version: '1.0.0' },
+    meta: { name: '@vybebot/eslint-plugin-discord', version: '1.0.0' },
     rules
 };
 
@@ -40,14 +40,14 @@ const WARN_RULES = new Set(['prefer-ephemeral-flag', 'prefer-v2-component']);
 
 const presetRules: NonNullable<TSESLint.FlatConfig.Config['rules']> = {};
 for (const name of Object.keys(rules)) {
-    presetRules[`@vybe-bot/discord/${name}`] = WARN_RULES.has(name) ? 'warn' : 'error';
+    presetRules[`@vybebot/discord/${name}`] = WARN_RULES.has(name) ? 'warn' : 'error';
 }
 
 export const recommended: TSESLint.FlatConfig.ConfigArray = [
     {
         files: ['**/*.ts', '**/*.mts', '**/*.cts', '**/*.tsx'],
         plugins: {
-            '@vybe-bot/discord': plugin,
+            '@vybebot/discord': plugin,
             discord: plugin
         },
         languageOptions: {

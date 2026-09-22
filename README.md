@@ -1,4 +1,4 @@
-# @vybe-bot/eslint-plugin-discord
+# @vybebot/eslint-plugin-discord
 
 Type-aware ESLint rules for discord.js bots and Components V2. Catches Discord REST API limits, invalid builder configurations, and Components V2 violations at compile time before deployment.
 
@@ -25,12 +25,12 @@ Forked and adapted from [seedcord](https://github.com/seedcord/seedcord)'s `esli
 ## Quick Start (ESLint 9+ Flat Config)
 
 ```sh
-npm install -D @vybe-bot/eslint-plugin-discord eslint
+npm install -D @vybebot/eslint-plugin-discord eslint
 ```
 
 In `eslint.config.js`:
 ```js
-import vybeDiscord from '@vybe-bot/eslint-plugin-discord';
+import vybeDiscord from '@vybebot/eslint-plugin-discord';
 
 export default [
   ...vybeDiscord.configs.recommended,

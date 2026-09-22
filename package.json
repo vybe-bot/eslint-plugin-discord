@@ -1,5 +1,5 @@
 {
-  "name": "@vybe-bot/eslint-plugin-discord",
+  "name": "@vybebot/eslint-plugin-discord",
   "version": "1.0.0",
   "description": "Type-aware ESLint rules for discord.js bots and Components V2",
   "type": "module",

@@ -1351,19 +1351,19 @@ var rules = {
   "valid-label-length": valid_label_length_default
 };
 var plugin = {
-  meta: { name: "@vybe-bot/eslint-plugin-discord", version: "1.0.0" },
+  meta: { name: "@vybebot/eslint-plugin-discord", version: "1.0.0" },
   rules
 };
 var WARN_RULES = /* @__PURE__ */ new Set(["prefer-ephemeral-flag", "prefer-v2-component"]);
 var presetRules = {};
 for (const name of Object.keys(rules)) {
-  presetRules[`@vybe-bot/discord/${name}`] = WARN_RULES.has(name) ? "warn" : "error";
+  presetRules[`@vybebot/discord/${name}`] = WARN_RULES.has(name) ? "warn" : "error";
 }
 var recommended = [
   {
     files: ["**/*.ts", "**/*.mts", "**/*.cts", "**/*.tsx"],
     plugins: {
-      "@vybe-bot/discord": plugin,
+      "@vybebot/discord": plugin,
       discord: plugin
     },
     languageOptions: {
