@@ -32,7 +32,7 @@ const rules = {
 } satisfies Record<string, TSESLint.RuleModule<string, readonly unknown[]>>;
 
 const plugin: TSESLint.FlatConfig.Plugin = {
-    meta: { name: '@vybebot/eslint-plugin-discord', version: '1.1.0' },
+    meta: { name: '@vybebot/eslint-plugin-discord', version: '1.1.1' },
     rules
 };
 

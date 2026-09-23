@@ -65,7 +65,7 @@ Options:
     }
 
     if (version) {
-        console.log('1.1.0');
+        console.log('1.1.1');
         return 0;
     }
 
@@ -124,7 +124,7 @@ Options:
         } else if (diag.category === ts.DiagnosticCategory.Warning) {
             warningCount++;
         }
-        console.error(ts.formatDiagnosticsWithColorAndContext([diag], formatHost).trimEnd());
+        console.log(ts.formatDiagnosticsWithColorAndContext([diag], formatHost).trimEnd());
     }
 
     for (const res of eslintResults) {
@@ -137,7 +137,7 @@ Options:
             }
             const severityLabel = msg.severity === 2 ? 'error' : 'warning';
             const ruleId = msg.ruleId ?? 'ESLINT';
-            console.error(`${relPath}:${msg.line}:${msg.column} - ${severityLabel} TS9001: [${ruleId}] ${msg.message}`);
+            console.log(`${relPath}:${msg.line}:${msg.column} - ${severityLabel} TS9001: [${ruleId}] ${msg.message}`);
         }
     }
 
