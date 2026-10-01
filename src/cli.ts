@@ -65,7 +65,7 @@ Options:
     }
 
     if (version) {
-        console.log('1.1.1');
+        console.log('1.2.0');
         return 0;
     }
 

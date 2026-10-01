@@ -11,6 +11,9 @@ Forked and adapted from [seedcord](https://github.com/seedcord/seedcord)'s `esli
 | `discord/no-discord-limit-exceeded` | Hard caps on builders: ActionRow (5 components), Modal (5 top-level components), SelectMenu (25 options), Embed (25 fields), SlashOption (25 choices). |
 | `discord/valid-command-description` | Slash command, subcommand, and option descriptions must be 1–100 characters. |
 | `discord/valid-label-length` | `LabelBuilder.setLabel()` must be 45 characters or fewer. |
+| `discord/valid-text-length` | Static text over Discord's limits: embed title, description, fields, footer, and author; button labels; select menu placeholders and options; modal titles; text inputs; text displays. |
+| `discord/no-unbounded-v2-components` | Warn when V2 components are added for every item of an uncapped list, which can pass the 40-component message limit. |
+| `discord/no-await-before-acknowledge` | Warn when a handler awaits other work before replying or deferring, which risks `10062 Unknown interaction`. |
 | `discord/no-mixed-message-format` | Disallow mixing Components V2 with `content`, `embeds`, `poll`, or `stickers`. |
 | `discord/require-components-v2-flag` | Require `MessageFlags.IsComponentsV2` when sending or updating V2 components. |
 | `discord/required-option-before-optional` | Disallow placing required slash command options after optional ones. |
